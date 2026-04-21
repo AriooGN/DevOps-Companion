@@ -18,7 +18,7 @@ Assets live in the [`photos/`](photos/) folder (paths below are relative to this
 
 **Dashboard overview** — project context, KPIs, charts, and team workload.
 
-![Dashboard overview](photos/image.png)
+![Dashboard overview](photos/home_page.png)
 
 **Unassigned tasks — AI task assignment** — select work items on `/dashboard/tasks`, run AI suggestions, then confirm or assign in bulk. The modal shows recommended assignees with rationale tied to workload and priority.
 

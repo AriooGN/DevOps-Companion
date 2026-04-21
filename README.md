@@ -153,6 +153,22 @@ If execution policy blocks scripts: `Set-ExecutionPolicy -Scope CurrentUser -Exe
 
 Do not commit **PATs**, **client secrets**, **JWTs**, or **OpenAI keys**. Use `.env` / `.env.local` only; rotate anything that ever appeared in git or chat.
 
+### Next steps
+
+Hardening beyond the competition baseline:
+
+- **Authenticate every Flask route.** Today the API does not verify callers; anything that can reach the backend can use the shared org PAT and OpenAI key. Require a verified identity or service token on each route (e.g. validate Entra tokens on Flask, or a short-lived backend JWT / HMAC shared only with the Next.js server).
+- **Lock down `POST /api/receive-token`.** Prove the caller is your app after a real login (shared secret, signed payload, or token validation)—do not accept arbitrary JSON as authoritative.
+- **Move off a single org-wide PAT for all users.** Prefer per-user Azure DevOps OAuth, or a narrowly scoped service principal / managed identity with explicit checks that the signed-in user may act on a given project or work item.
+- **Stop logging secrets.** Never print access tokens or PATs to stdout or logs; treat log aggregation as untrusted storage.
+- **Avoid mutating `Back End/.env` at runtime in production** (project switching writes the file today). Prefer a database or managed config; keep secrets out of files that are easy to mis-copy or commit.
+- **Tighten error responses** so clients get generic messages while detailed errors stay in server-side logs only (avoid leaking paths or internals via `500` bodies).
+- **Rate-limit** expensive endpoints (GPT, bulk assign, chatbot) to limit abuse and cost.
+- **Deploy behind HTTPS** with an explicit CORS allowlist for real origins; do not expose Flask directly to the internet without authentication.
+- **Treat OpenAI traffic as sensitive** (work items, names). Consider **Azure OpenAI** in your tenant, private networking, and policies for retention and PII.
+- **Harden the chatbot** against prompt injection (validate tool arguments, constrain tools, review untrusted work item text).
+- **Run Flask without debug in production**, patch dependencies, and use scoped PATs / separate keys per environment with rotation.
+
 ### Attribution
 
 Dashboard UI stack and patterns derive from the **Shadcn / Next.js dashboard starter** ecosystem; backend and competition-specific integrations are project-specific. See **`next-shadcn-dashboard-starter/README.md`** for the upstream template feature list (tables, forms, kbar, etc.).
